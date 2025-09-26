@@ -32,7 +32,7 @@ async function generateVideoPage(videoData) {
         
         try {
             // Enviar los datos del video al servidor para crear la página
-            const response = await fetch('/api/create-video', {
+            const response = await fetch('/.netlify/functions/create-video', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
