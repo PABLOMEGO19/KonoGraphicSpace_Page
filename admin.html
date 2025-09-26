@@ -547,11 +547,16 @@
         function renderVideos() {
             const container = document.getElementById('videos-container');
             container.innerHTML = '';
+            
+            // Inicializar contadores
+            let publicCount = 0;
+            let hiddenCount = 0;
 
             if (window.videos.length === 0) {
                 container.innerHTML = '<p>No hay videos guardados.</p>';
                 return;
             }
+            
             // Crear encabezado de la tabla
             const header = document.createElement('div');
             header.className = 'video-item header';

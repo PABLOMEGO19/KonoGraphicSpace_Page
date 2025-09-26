@@ -45,6 +45,7 @@ async function generateVideoPage(videoData) {
         // En un entorno real, aquí subirías el archivo a Netlify o a tu servidor
         return {
             success: true,
+            fileName: videoPagePath,  // Asegurarse de que fileName esté incluido
             pageUrl: `/${videoPagePath}`,
             videoId: videoId
         };
