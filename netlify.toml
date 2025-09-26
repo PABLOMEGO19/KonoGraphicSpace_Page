@@ -7,3 +7,8 @@
   from = "/videos/*"
   to = "/.netlify/functions/get-video/:splat"
   status = 200
+
+[[redirects]]
+  from = "/api/create-video"
+  to = "/.netlify/functions/create-video"
+  status = 200

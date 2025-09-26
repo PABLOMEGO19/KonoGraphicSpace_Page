@@ -14,10 +14,18 @@ function downloadFile(filename, content, type = 'text/html') {
 // Función para generar la página de un vídeo
 async function generateVideoPage(videoData) {
     try {
-        // Obtener el template de la página de vídeo
-        const response = await fetch('Video_Trabajo_Template.html');
+        // Enviar los datos del video al servidor para crear la página
+        const response = await fetch('/api/create-video', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(videoData)
+        });
+
         if (!response.ok) {
-            throw new Error('No se pudo cargar la plantilla del video');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Error al crear el video');
         }
         let template = await response.text();
         
@@ -113,29 +121,19 @@ async function generateVideoPage(videoData) {
             
             console.log('Página de vídeo generada:', videoPagePath);
             
-            return {
-                success: true,
-                fileName: videoPagePath,
-                pageUrl: `/${videoPagePath}`,
-                videoId: videoId
-            };
+            // Mostrar mensaje de éxito con enlace al video
+            const result = await response.json();
+            alert(`¡Video "${videoData.title}" creado exitosamente!`);
+            
+            // Redirigir a la página del video
+            window.location.href = result.videoUrl;
+            return true;
             
         } catch (error) {
-            console.error('Error al guardar el archivo:', error);
-            
-            // Si hay un error, ofrecer descargar el archivo HTML
-            downloadFile(`${videoId}.html`, html);
-            
-            return {
-                success: true,
-                fileName: videoPagePath,
-                pageUrl: `/${videoPagePath}`,
-                videoId: videoId,
-                htmlContent: html,
-                warning: `No se pudo guardar el archivo automáticamente. Se ha descargado el archivo HTML. Por favor, guárdalo manualmente como '${videoPagePath}'.`
-            };
+            console.error('Error al crear el video:', error);
+            alert('Error al crear el video: ' + error.message);
+            return false;
         }
-        
     } catch (error) {
         console.error('Error al generar la página del vídeo:', error);
         return {

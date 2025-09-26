@@ -1,0 +1,9 @@
+{
+  "name": "create-video-function",
+  "version": "1.0.0",
+  "description": "Función para crear páginas de video en GitHub",
+  "main": "create-video.js",
+  "dependencies": {
+    "@octokit/rest": "^19.0.13"
+  }
+}
