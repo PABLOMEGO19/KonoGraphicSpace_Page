@@ -6,7 +6,7 @@ const templatePath = path.join(process.cwd(), 'Video_Trabajo_Template.html');
 const template = fs.readFileSync(templatePath, 'utf8');
 
 // Cargar los datos de los vídeos
-const videosData = require('../../src/data/videos.json');
+const videosData = require('./videos.json');
 
 exports.handler = async (event, context) => {
   try {
