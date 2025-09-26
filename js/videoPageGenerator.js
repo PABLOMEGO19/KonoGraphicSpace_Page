@@ -43,12 +43,18 @@ async function generateVideoPage(videoData) {
         console.log('Video creado exitosamente:', result);
         
         // Mostrar mensaje de éxito con enlace al video
-        if (result.success && result.videoUrl) {
-            alert(`¡Video "${videoData.title || 'sin título'}" creado exitosamente!`);
-            window.location.href = result.videoUrl;
+        if (result.success && result.siteUrl) {
+            const message = `¡Video "${videoData.title || 'sin título'}" creado exitosamente!\n\n` +
+                          `Puedes verlo en: ${result.siteUrl}\n` +
+                          `Ver en GitHub: ${result.githubUrl}`;
+            
+            alert(message);
+            
+            // Redirigir al usuario a la página del video
+            window.location.href = result.siteUrl;
             return true;
         } else {
-            throw new Error('Respuesta inesperada del servidor');
+            throw new Error('La respuesta del servidor no contiene la URL del video');
         }
         
         // Crear un ID único para el vídeo si no existe

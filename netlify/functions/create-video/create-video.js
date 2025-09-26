@@ -4,6 +4,10 @@ const { Octokit } = require('@octokit/rest');
 const REPO_OWNER = 'PABLOMEGO19';
 const REPO_NAME = 'KonoGraphicSpace_Page';
 const BRANCH = 'main';
+const COMMITTER = {
+    name: 'KonoGraphic Bot',
+    email: 'bot@konographic.space'
+};
 
 // Configuración de CORS
 const headers = {
@@ -49,52 +53,64 @@ exports.handler = async function(event, context) {
         });
 
         // 1. Obtener la referencia actual del branch
-        const { data: refData } = await octokit.git.getRef({
+        const { data: ref } = await octokit.git.getRef({
             owner: REPO_OWNER,
             repo: REPO_NAME,
             ref: `heads/${BRANCH}`
         });
 
         // 2. Obtener el commit actual
-        const { data: commitData } = await octokit.git.getCommit({
+        const { data: currentCommit } = await octokit.git.getCommit({
             owner: REPO_OWNER,
             repo: REPO_NAME,
-            commit_sha: refData.object.sha
+            commit_sha: ref.object.sha
         });
 
-        // 3. Crear el árbol con el nuevo archivo
-        const { data: treeData } = await octokit.git.createTree({
+        // 3. Crear el blob con el contenido del archivo
+        const fileContent = generateVideoPageHTML(videoData);
+        const { data: blob } = await octokit.git.createBlob({
             owner: REPO_OWNER,
             repo: REPO_NAME,
-            base_tree: commitData.tree.sha,
-            tree: [
-                {
-                    path: videoPath,
-                    mode: '100644',
-                    type: 'blob',
-                    content: generateVideoPageHTML(videoData)
-                }
-            ]
+            content: fileContent,
+            encoding: 'utf-8'
         });
 
-        // 4. Crear un nuevo commit
+        // 4. Crear un nuevo árbol con el archivo
+        const { data: tree } = await octokit.git.createTree({
+            owner: REPO_OWNER,
+            repo: REPO_NAME,
+            base_tree: currentCommit.tree.sha,
+            tree: [{
+                path: videoPath,
+                mode: '100644',
+                type: 'blob',
+                sha: blob.sha
+            }]
+        });
+
+        // 5. Crear un nuevo commit
         const { data: newCommit } = await octokit.git.createCommit({
             owner: REPO_OWNER,
             repo: REPO_NAME,
             message: `Añadir video: ${videoData.title || videoId}`,
-            tree: treeData.sha,
-            parents: [commitData.sha]
+            tree: tree.sha,
+            parents: [currentCommit.sha],
+            author: COMMITTER,
+            committer: COMMITTER
         });
 
-        // 5. Actualizar la referencia del branch
+        // 6. Actualizar la referencia del branch
         await octokit.git.updateRef({
             owner: REPO_OWNER,
             repo: REPO_NAME,
             ref: `heads/${BRANCH}`,
-            sha: newCommit.sha,
-            force: false
+            sha: newCommit.sha
         });
 
+        // Obtener la URL del archivo en GitHub
+        const githubFileUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${videoPath}`;
+        const siteUrl = `https://${REPO_NAME}.netlify.app/${videoPath}`;
+        
         return {
             statusCode: 200,
             headers: {
@@ -105,6 +121,8 @@ exports.handler = async function(event, context) {
                 success: true,
                 message: 'Video creado exitosamente',
                 videoUrl: `/${videoPath}`,
+                githubUrl: githubFileUrl,
+                siteUrl: siteUrl,
                 videoId: videoId
             })
         };
