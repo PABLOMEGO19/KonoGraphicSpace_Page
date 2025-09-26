@@ -1,8 +1,24 @@
+// Función para descargar un archivo
+function downloadFile(filename, content, type = 'text/html') {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 // Función para generar la página de un vídeo
 async function generateVideoPage(videoData) {
     try {
         // Obtener el template de la página de vídeo
         const response = await fetch('Video_Trabajo_Template.html');
+        if (!response.ok) {
+            throw new Error('No se pudo cargar la plantilla del video');
+        }
         let template = await response.text();
         
         // Crear un ID único para el vídeo si no existe
@@ -38,17 +54,87 @@ async function generateVideoPage(videoData) {
         
         // Crear la ruta de destino
         const videoPagePath = `videos/${videoId}/index.html`;
+        const folderPath = `videos/${videoId}`;
         
-        // Guardar la página generada (esto es un ejemplo, en producción necesitarías subirlo a Netlify)
-        console.log('Página de vídeo generada:', videoPagePath);
+        // Verificar si estamos en un entorno que soporta File System Access API
+        const supportsFileSystemAccess = 'showDirectoryPicker' in window;
         
-        // En un entorno real, aquí subirías el archivo a Netlify o a tu servidor
-        return {
-            success: true,
-            fileName: videoPagePath,  // Asegurarse de que fileName esté incluido
-            pageUrl: `/${videoPagePath}`,
-            videoId: videoId
-        };
+        try {
+            if (supportsFileSystemAccess) {
+                // Intentar usar la API de File System Access
+                const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                let folderHandle;
+                
+                try {
+                    folderHandle = await dirHandle.getDirectoryHandle(folderPath, { create: true });
+                } catch (e) {
+                    console.error('No se pudo crear la carpeta:', e);
+                    throw new Error('No se pudo crear la carpeta. Asegúrate de tener los permisos necesarios.');
+                }
+                
+                try {
+                    const fileHandle = await folderHandle.getFileHandle('index.html', { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(html);
+                    await writable.close();
+                    console.log('Archivo guardado con éxito usando File System Access API');
+                } catch (e) {
+                    console.error('No se pudo guardar el archivo:', e);
+                    throw new Error('No se pudo guardar el archivo. Asegúrate de tener los permisos necesarios.');
+                }
+            } else {
+                // Usar descarga para navegadores que no soportan File System Access API
+                console.log('Navegador no soporta File System Access API. Usando descarga...');
+                downloadFile('index.html', html);
+                
+                // Crear un archivo de instrucciones
+                const instructions = `INSTRUCCIONES PARA GUARDAR EL ARCHIVO:
+
+1. Crea una carpeta llamada "${folderPath}" en la raíz de tu proyecto.
+2. Guarda el archivo "index.html" que acabas de descargar dentro de esa carpeta.
+3. Asegúrate de que la estructura de carpetas sea:
+   - tu-proyecto/
+     - videos/
+       - ${videoId}/
+         - index.html
+
+¡Listo! La página de tu video estará disponible en: /${videoPagePath}`;
+                
+                downloadFile('instrucciones.txt', instructions, 'text/plain');
+                
+                return {
+                    success: true,
+                    fileName: videoPagePath,
+                    pageUrl: `/${videoPagePath}`,
+                    videoId: videoId,
+                    warning: 'Se ha descargado el archivo. Sigue las instrucciones en el archivo de texto para completar la instalación.'
+                };
+            }
+            
+            console.log('Página de vídeo generada:', videoPagePath);
+            
+            return {
+                success: true,
+                fileName: videoPagePath,
+                pageUrl: `/${videoPagePath}`,
+                videoId: videoId
+            };
+            
+        } catch (error) {
+            console.error('Error al guardar el archivo:', error);
+            
+            // Si hay un error, ofrecer descargar el archivo HTML
+            downloadFile(`${videoId}.html`, html);
+            
+            return {
+                success: true,
+                fileName: videoPagePath,
+                pageUrl: `/${videoPagePath}`,
+                videoId: videoId,
+                htmlContent: html,
+                warning: `No se pudo guardar el archivo automáticamente. Se ha descargado el archivo HTML. Por favor, guárdalo manualmente como '${videoPagePath}'.`
+            };
+        }
         
     } catch (error) {
         console.error('Error al generar la página del vídeo:', error);
