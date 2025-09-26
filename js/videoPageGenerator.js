@@ -16,27 +16,73 @@ async function generateVideoPage(videoData) {
     try {
         console.log('Enviando datos del video:', videoData);
         
-        // Enviar los datos del video al servidor para crear la página
-        const response = await fetch('/api/create-video', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(videoData)
-        });
-
-        console.log('Respuesta del servidor:', response.status, response.statusText);
+        // Mostrar mensaje de carga
+        const loadingMessage = document.createElement('div');
+        loadingMessage.style.position = 'fixed';
+        loadingMessage.style.top = '20px';
+        loadingMessage.style.left = '50%';
+        loadingMessage.style.transform = 'translateX(-50%)';
+        loadingMessage.style.backgroundColor = '#4CAF50';
+        loadingMessage.style.color = 'white';
+        loadingMessage.style.padding = '15px';
+        loadingMessage.style.borderRadius = '5px';
+        loadingMessage.style.zIndex = '1000';
+        loadingMessage.textContent = 'Creando video, por favor espera...';
+        document.body.appendChild(loadingMessage);
         
-        if (!response.ok) {
-            let errorData;
-            try {
-                errorData = await response.json();
-                console.error('Error del servidor:', errorData);
-            } catch (e) {
-                throw new Error(`Error ${response.status}: ${response.statusText}`);
+        try {
+            // Enviar los datos del video al servidor para crear la página
+            const response = await fetch('/api/create-video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(videoData)
+            });
+
+            console.log('Respuesta del servidor:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                let errorData;
+                try {
+                    errorData = await response.json();
+                    console.error('Error del servidor:', errorData);
+                    throw new Error(errorData.error || errorData.message || `Error ${response.status}: ${response.statusText}`);
+                } catch (e) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
             }
-            throw new Error(errorData.error || errorData.message || 'Error al crear el video');
+            
+            const result = await response.json();
+            console.log('Respuesta completa del servidor:', result);
+            
+            if (result.success && result.siteUrl) {
+                // Mostrar mensaje de éxito
+                loadingMessage.textContent = '¡Video creado exitosamente! Redirigiendo...';
+                loadingMessage.style.backgroundColor = '#4CAF50';
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = result.siteUrl;
+                }, 2000);
+                
+                return true;
+            } else {
+                throw new Error('La respuesta del servidor no contiene la URL del video');
+            }
+            
+        } catch (error) {
+            console.error('Error al crear el video:', error);
+            loadingMessage.textContent = `Error: ${error.message}`;
+            loadingMessage.style.backgroundColor = '#f44336';
+            
+            // Ocultar el mensaje después de 5 segundos
+            setTimeout(() => {
+                document.body.removeChild(loadingMessage);
+            }, 5000);
+            
+            throw error;
         }
         
         const result = await response.json();

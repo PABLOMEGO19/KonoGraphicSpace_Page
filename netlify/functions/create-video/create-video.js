@@ -42,22 +42,30 @@ exports.handler = async function(event, context) {
         const videoPath = `videos/${videoId}/index.html`;
         
         // Autenticación con GitHub usando token de acceso personal
-        if (!process.env.GITHUB_TOKEN) {
-            throw new Error('Token de GitHub no configurado. Por favor, configura la variable de entorno GITHUB_TOKEN.');
+        const githubToken = process.env.GITHUB_TOKEN;
+        if (!githubToken) {
+            console.error('Error: GITHUB_TOKEN no está configurado');
+            throw new Error('Error de configuración del servidor. Por favor, contacta al administrador.');
         }
 
+        console.log('Inicializando cliente de GitHub...');
         const octokit = new Octokit({
-            auth: process.env.GITHUB_TOKEN,
+            auth: githubToken,
             userAgent: 'KonoGraphicSpace-Page/1.0.0',
-            timeZone: 'Europe/Madrid'
+            timeZone: 'Europe/Madrid',
+            log: console
         });
 
+        console.log('Cliente de GitHub inicializado correctamente');
+
+        console.log('Obteniendo referencia del branch...');
         // 1. Obtener la referencia actual del branch
         const { data: ref } = await octokit.git.getRef({
             owner: REPO_OWNER,
             repo: REPO_NAME,
             ref: `heads/${BRANCH}`
         });
+        console.log('Referencia obtenida:', ref.object.sha);
 
         // 2. Obtener el commit actual
         const { data: currentCommit } = await octokit.git.getCommit({
@@ -67,13 +75,16 @@ exports.handler = async function(event, context) {
         });
 
         // 3. Crear el blob con el contenido del archivo
+        console.log('Generando contenido HTML...');
         const fileContent = generateVideoPageHTML(videoData);
+        console.log('Creando blob en GitHub...');
         const { data: blob } = await octokit.git.createBlob({
             owner: REPO_OWNER,
             repo: REPO_NAME,
             content: fileContent,
             encoding: 'utf-8'
         });
+        console.log('Blob creado con SHA:', blob.sha);
 
         // 4. Crear un nuevo árbol con el archivo
         const { data: tree } = await octokit.git.createTree({
