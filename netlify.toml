@@ -1,15 +1,9 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "" # no hay build
+  publish = "public" # carpeta donde pongas tu HTML/CSS/JS
   functions = "netlify/functions"
 
 [[redirects]]
   from = "/videos/*"
   to = "/.netlify/functions/get-video/:splat"
   status = 200
-
-[dev]
-  framework = "#custom"
-  command = "npm run dev"
-  targetPort = 3000
-  publish = "dist"
