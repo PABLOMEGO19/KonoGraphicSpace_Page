@@ -10,6 +10,10 @@
     NODE_VERSION = "14.0.0"
     NPM_FLAGS = "--prefix=netlify/functions/create-video"
 
+# Configuración del plugin de instalación de funciones
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
 # Redirecciones
 [[redirects]]
   from = "/videos/*"

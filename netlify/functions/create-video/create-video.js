@@ -1,5 +1,4 @@
 const { Octokit } = require('@octokit/rest');
-const { createAppAuth } = require('@octokit/auth-app');
 
 // Configuración del repositorio
 const REPO_OWNER = 'PABLOMEGO19';
@@ -21,9 +20,15 @@ exports.handler = async function(event, context) {
         const videoId = videoData.id || `video-${Date.now()}`;
         const videoPath = `videos/${videoId}/index.html`;
         
-        // Autenticación con GitHub
+        // Autenticación con GitHub usando token de acceso personal
+        if (!process.env.GITHUB_TOKEN) {
+            throw new Error('Token de GitHub no configurado. Por favor, configura la variable de entorno GITHUB_TOKEN.');
+        }
+
         const octokit = new Octokit({
-            auth: process.env.GITHUB_TOKEN
+            auth: process.env.GITHUB_TOKEN,
+            userAgent: 'KonoGraphicSpace-Page/1.0.0',
+            timeZone: 'Europe/Madrid'
         });
 
         // 1. Obtener la referencia actual del branch

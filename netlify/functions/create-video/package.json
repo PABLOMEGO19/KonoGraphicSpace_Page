@@ -4,6 +4,7 @@
   "description": "Función para crear páginas de video en GitHub",
   "main": "create-video.js",
   "dependencies": {
-    "@octokit/rest": "^19.0.13"
+    "@octokit/rest": "^19.0.13",
+    "@octokit/auth-app": "^5.0.4"
   }
 }

@@ -18,7 +18,11 @@
   },
   "homepage": "https://konographic.space",
   "dependencies": {
-    "@octokit/rest": "^19.0.13"
+    "@octokit/rest": "^19.0.13",
+    "@octokit/auth-app": "^5.0.4"
+  },
+  "devDependencies": {
+    "@netlify/plugin-functions-install-core": "^2.0.0"
   },
   "engines": {
     "node": ">=14.0.0"
