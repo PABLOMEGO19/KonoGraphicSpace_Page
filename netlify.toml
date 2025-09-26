@@ -1,14 +1,40 @@
 [build]
-  command = "" # no hay build
-  publish = "." # apunta al directorio raíz
+  # Comando de build (dejamos vacío ya que es un sitio estático)
+  command = ""
+  # Directorio que contiene los archivos estáticos
+  publish = "."
+  # Directorio de las funciones serverless
   functions = "netlify/functions"
+  # Configuración de Node.js
+  [build.environment]
+    NODE_VERSION = "14.0.0"
+    NPM_FLAGS = "--prefix=netlify/functions/create-video"
 
+# Redirecciones
 [[redirects]]
   from = "/videos/*"
   to = "/.netlify/functions/get-video/:splat"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/create-video"
   to = "/.netlify/functions/create-video"
   status = 200
+  force = true
+
+# Configuración de funciones
+[functions]
+  # Directorio donde están las funciones
+  directory = "netlify/functions"
+  # Tiempo de espera máximo para las funciones (en segundos)
+  node_bundler = "esbuild"
+
+# Configuración de encabezados
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Configuración de CORS para las funciones
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"

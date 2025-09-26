@@ -1,7 +1,7 @@
 {
-  "name": "5.-pagina-web---copia",
+  "name": "konographic-space",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000K\u0000o\u0000n\u0000o\u0000G\u0000r\u0000a\u0000p\u0000h\u0000i\u0000c\u0000S\u0000p\u0000a\u0000c\u0000e\u0000_\u0000P\u0000a\u0000g\u0000e\u0000\r\u0000 \u0000",
+  "description": "Sitio web de KonoGraphicSpace",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,11 +10,17 @@
     "type": "git",
     "url": "git+https://github.com/PABLOMEGO19/KonoGraphicSpace_Page.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["portfolio", "design", "graphic"],
+  "author": "Pablo Mego",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/PABLOMEGO19/KonoGraphicSpace_Page/issues"
   },
-  "homepage": "https://github.com/PABLOMEGO19/KonoGraphicSpace_Page#readme"
+  "homepage": "https://konographic.space",
+  "dependencies": {
+    "@octokit/rest": "^19.0.13"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
