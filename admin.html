@@ -710,118 +710,30 @@
             
             // Guardar cambios y actualizar la vista
             saveVideos();
-            renderVideos();
-        }
 
-        // Función para agregar o actualizar un video
-        async function saveVideo() {
-            const title = document.getElementById('video-title').value;
-            const description = document.getElementById('video-description').value;
-            const pageUrl = document.getElementById('video-page-url').value;
-            const youtubeUrl = document.getElementById('video-youtube').value;
-            const thumbnailUrl = document.getElementById('video-thumbnail').value;
-            const tags = document.getElementById('video-tags').value.split(',').map(tag => tag.trim());
-            const isPublic = document.querySelector('input[name="visibility"]:checked').value === 'public';
-            const shortDescription = document.getElementById('video-short-description')?.value || '';
-            const longDescription = document.getElementById('video-description').value || description;
-            
-            // Extraer el ID del vídeo de YouTube
-            let youtubeId = '';
-            try {
-                const url = new URL(youtubeUrl);
-                if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
-                    if (url.hostname.includes('youtube.com')) {
-                        youtubeId = url.searchParams.get('v');
-                    } else if (url.hostname.includes('youtu.be')) {
-                        youtubeId = url.pathname.split('/').pop();
-                    }
-                }
-            } catch (e) {
-                console.error('Error al procesar la URL de YouTube:', e);
-            }
-            
-            // Si no se pudo extraer el ID, mostrar error
-            if (!youtubeId) {
-                showNotification('Por favor, introduce una URL de YouTube válida', 'error');
-                return;
-            }
-            
-            // Generar URL de miniatura de YouTube si no se proporciona una miniatura
-            const finalThumbnailUrl = thumbnailUrl || 
-                `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
-            
-            // Crear un ID único para el vídeo basado en el título
-            const videoId = title.toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/(^-|-$)/g, '');
+// Función para seleccionar/deseleccionar todos los videos
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.video-checkbox-input');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+    updateDeleteButton();
+}
 
-            const videoData = {
-                id: videoId,
-                title,
-                description,
-                shortDescription,
-                longDescription,
-                tag: tags[0] || 'Sin etiqueta',
-                pageUrl: pageUrl || `/videos/${videoId}`,
-                youtubeUrl,
-                youtubeId,
-                thumbnail: finalThumbnailUrl,
-                tags: [...new Set(tags)], // Eliminar duplicados
-                isPublic: isPublic,
-                createdAt: new Date().toISOString(),
-                // Para compatibilidad con la generación de páginas
-                images: [
-                    finalThumbnailUrl,
-                    `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`
-                ]
-            };
+// Función para actualizar el estado del botón de eliminar seleccionados
+function updateDeleteButton() {
+    const deleteBtn = document.getElementById('delete-selected-btn');
+    const selectedCount = document.querySelectorAll('.video-checkbox-input:checked').length;
+    
+    deleteBtn.disabled = selectedCount === 0;
+    deleteBtn.textContent = `Eliminar (${selectedCount})`;
+}
 
-            try {
-                // Generar la página del vídeo
-                const pageResult = await generateVideoPage(videoData);
-                
-                if (pageResult && pageResult.success) {
-                    // Si la página se generó correctamente, actualizamos la URL
-                    videoData.pageUrl = pageResult.pageUrl;
-                    
-                    // Mostrar notificación de éxito
-                    showNotification('Vídeo guardado y página generada correctamente', 'success');
-                } else {
-                    console.warn('No se pudo generar la página del vídeo:', pageResult?.error);
-                    showNotification('Vídeo guardado, pero hubo un error al generar la página', 'warning');
-                }
-                
-                if (currentEditIndex === -1) {
-                    // Agregar nuevo video
-                    videos.push(videoData);
-                } else {
-                    // Actualizar video existente
-                    videos[currentEditIndex] = videoData;
-                    currentEditIndex = -1;
-                    document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Agregar Video';
-                }
-
-                saveVideos();
-                document.getElementById('video-form').reset();
-                
-                // Recargar la lista de vídeos
-                renderVideos();
-                
-            } catch (error) {
-                console.error('Error al guardar el vídeo:', error);
-                showNotification('Error al guardar el vídeo: ' + error.message, 'error');
-            }
-        }
-
-        // Función para editar un video
-        function editVideo(index) {
-            const video = videos[index];
-            document.getElementById('video-title').value = video.title || '';
-            document.getElementById('video-short-description').value = video.shortDescription || video.description || '';
-            document.getElementById('video-description').value = video.longDescription || video.description || '';
-            document.getElementById('video-page-url').value = video.pageUrl || '';
-            document.getElementById('video-youtube').value = video.youtubeUrl || '';
-            document.getElementById('video-thumbnail').value = video.thumbnail || '';
+// Función para cambiar la visibilidad de un video
+function toggleVideoVisibility(index, isPublic) {
+    if (index >= 0 && index < videos.length) {
+        videos[index].isPublic = isPublic;
+        saveVideos();
             
             // Manejar las etiquetas (pueden venir como array o como string)
             if (Array.isArray(video.tags)) {
@@ -1412,6 +1324,7 @@
             background: #45a049;
         }
     </style>
-    <script src="js/videoPageGenerator.js"></script>
+    <script src="js/videoPageGeneratorSimple.js"></script>
+    <script src="js/saveVideoFunction.js"></script>
 </body>
 </html>
