@@ -5,11 +5,28 @@ const REPO_OWNER = 'PABLOMEGO19';
 const REPO_NAME = 'KonoGraphicSpace_Page';
 const BRANCH = 'main';
 
+// Configuración de CORS
+const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+};
+
 exports.handler = async function(event, context) {
+    // Manejar solicitud OPTIONS para CORS preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 204,
+            headers,
+            body: ''
+        };
+    }
+    
     // Solo permitir métodos POST
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
+            headers,
             body: JSON.stringify({ error: 'Method Not Allowed' })
         };
     }
@@ -80,10 +97,15 @@ exports.handler = async function(event, context) {
 
         return {
             statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers
+            },
             body: JSON.stringify({
                 success: true,
                 message: 'Video creado exitosamente',
-                videoUrl: `/${videoPath}`
+                videoUrl: `/${videoPath}`,
+                videoId: videoId
             })
         };
 
@@ -91,9 +113,15 @@ exports.handler = async function(event, context) {
         console.error('Error:', error);
         return {
             statusCode: 500,
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers
+            },
             body: JSON.stringify({
+                success: false,
                 error: 'Error al crear el video',
-                details: error.message
+                details: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
             })
         };
     }

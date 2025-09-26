@@ -14,20 +14,42 @@ function downloadFile(filename, content, type = 'text/html') {
 // Función para generar la página de un vídeo
 async function generateVideoPage(videoData) {
     try {
+        console.log('Enviando datos del video:', videoData);
+        
         // Enviar los datos del video al servidor para crear la página
         const response = await fetch('/api/create-video', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(videoData)
         });
 
+        console.log('Respuesta del servidor:', response.status, response.statusText);
+        
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Error al crear el video');
+            let errorData;
+            try {
+                errorData = await response.json();
+                console.error('Error del servidor:', errorData);
+            } catch (e) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+            throw new Error(errorData.error || errorData.message || 'Error al crear el video');
         }
-        let template = await response.text();
+        
+        const result = await response.json();
+        console.log('Video creado exitosamente:', result);
+        
+        // Mostrar mensaje de éxito con enlace al video
+        if (result.success && result.videoUrl) {
+            alert(`¡Video "${videoData.title || 'sin título'}" creado exitosamente!`);
+            window.location.href = result.videoUrl;
+            return true;
+        } else {
+            throw new Error('Respuesta inesperada del servidor');
+        }
         
         // Crear un ID único para el vídeo si no existe
         const videoId = videoData.id || `video-${Date.now()}`;
