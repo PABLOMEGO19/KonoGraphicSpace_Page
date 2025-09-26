@@ -14,7 +14,7 @@ function downloadFile(filename, content, type = 'text/html') {
 // Función para generar la página de un vídeo
 async function generateVideoPage(videoData) {
     try {
-        console.log('Enviando datos del video:', videoData);
+        console.log('Generando página de video localmente:', videoData);
         
         // Mostrar mensaje de carga
         const loadingMessage = document.createElement('div');
@@ -27,59 +27,54 @@ async function generateVideoPage(videoData) {
         loadingMessage.style.padding = '15px';
         loadingMessage.style.borderRadius = '5px';
         loadingMessage.style.zIndex = '1000';
-        loadingMessage.textContent = 'Creando video, por favor espera...';
+        loadingMessage.textContent = 'Generando video, por favor espera...';
         document.body.appendChild(loadingMessage);
         
         try {
-            // Enviar los datos del video al servidor para crear la página
-            const response = await fetch('/.netlify/functions/create-video', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(videoData)
-            });
-
-            console.log('Respuesta del servidor:', response.status, response.statusText);
+            // Generar el HTML del video
+            const videoId = videoData.id || `video-${Date.now()}`;
+            const fileName = `video-${videoId}.html`;
+            const htmlContent = generateVideoHTML(videoData);
             
-            if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                    console.error('Error del servidor:', errorData);
-                    throw new Error(errorData.error || errorData.message || `Error ${response.status}: ${response.statusText}`);
-                } catch (e) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-            }
+            // Crear un enlace de descarga
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
             
-            const result = await response.json();
-            console.log('Respuesta completa del servidor:', result);
+            // Crear un enlace temporal y simular clic para descargar
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
             
-            if (result.success && result.siteUrl) {
+            // Limpiar
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
                 // Mostrar mensaje de éxito
-                loadingMessage.textContent = '¡Video creado exitosamente! Redirigiendo...';
+                loadingMessage.textContent = '¡Video generado exitosamente! Se ha descargado el archivo.';
                 loadingMessage.style.backgroundColor = '#4CAF50';
                 
-                // Redirigir después de 2 segundos
+                // Ocultar el mensaje después de 5 segundos
                 setTimeout(() => {
-                    window.location.href = result.siteUrl;
-                }, 2000);
+                    document.body.removeChild(loadingMessage);
+                }, 5000);
                 
-                return true;
-            } else {
-                throw new Error('La respuesta del servidor no contiene la URL del video');
-            }
+            }, 100);
+            
+            return true;
             
         } catch (error) {
-            console.error('Error al crear el video:', error);
-            loadingMessage.textContent = `Error: ${error.message}`;
+            console.error('Error al generar el video:', error);
+            loadingMessage.textContent = `Error: ${error.message || 'Error desconocido al generar el video'}`;
             loadingMessage.style.backgroundColor = '#f44336';
             
             // Ocultar el mensaje después de 5 segundos
             setTimeout(() => {
-                document.body.removeChild(loadingMessage);
+                if (document.body.contains(loadingMessage)) {
+                    document.body.removeChild(loadingMessage);
+                }
             }, 5000);
             
             throw error;
@@ -215,6 +210,100 @@ async function generateVideoPage(videoData) {
             error: error.message
         };
     }
+}
+
+// Función para generar el HTML del video
+function generateVideoHTML(videoData) {
+    const { title = 'Video sin título', description = '', videoUrl = '' } = videoData;
+    
+    return `
+    <!DOCTYPE html>
+    <html data-site="konographic.space" lang="es">
+    <head>
+        <meta charset="utf-8"/>
+        <title>${title} | Kono Graphic | Video Creativo y Edición</title>
+        <meta name="description" content="${description || 'Video creado con Kono Graphic'}"/>
+        <meta property="og:title" content="${title} | Kono Graphic"/>
+        <meta property="og:description" content="${description || 'Video creado con Kono Graphic'}"/>
+        <meta property="og:type" content="video.other"/>
+        <meta name="twitter:card" content="player"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background-color: #f5f5f5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
+            .video-container {
+                max-width: 800px;
+                width: 100%;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            .video-wrapper {
+                position: relative;
+                padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+                height: 0;
+                overflow: hidden;
+                background: #000;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            .video-wrapper video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
+            }
+            .video-info {
+                margin-top: 20px;
+                padding: 20px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .video-title {
+                margin: 0 0 10px 0;
+                color: #333;
+            }
+            .video-description {
+                color: #666;
+                line-height: 1.5;
+            }
+            .watermark {
+                text-align: center;
+                margin-top: 20px;
+                color: #999;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="video-container">
+            <div class="video-wrapper">
+                <video controls autoplay>
+                    <source src="${videoUrl}" type="video/mp4">
+                    Tu navegador no soporta la reproducción de videos.
+                </video>
+            </div>
+            <div class="video-info">
+                <h1 class="video-title">${title}</h1>
+                ${description ? `<p class="video-description">${description}</p>` : ''}
+            </div>
+            <div class="watermark">
+                Creado con Kono Graphic - <a href="https://konographic.space" target="_blank">konographic.space</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
 }
 
 // Función para manejar la subida de archivos al servidor (Netlify)
