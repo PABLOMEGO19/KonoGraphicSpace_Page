@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Cargar el template HTML
-const templatePath = path.join(process.cwd(), 'Video_Trabajo_Template.html');
+const templatePath = path.join(__dirname, '..', '..', 'Video_Trabajo_Template.html');
 const template = fs.readFileSync(templatePath, 'utf8');
 
 // Cargar los datos de los vídeos

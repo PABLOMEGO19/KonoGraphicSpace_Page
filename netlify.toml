@@ -1,6 +1,6 @@
 [build]
   command = "" # no hay build
-  publish = "public" # carpeta donde pongas tu HTML/CSS/JS
+  publish = "." # apunta al directorio raíz
   functions = "netlify/functions"
 
 [[redirects]]
