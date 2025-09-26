@@ -1,0 +1,15 @@
+{
+  "videos": [
+    {
+      "id": "mi-primer-video",
+      "title": "Mi Primer Video",
+      "description": "Esta es la descripción de mi primer video",
+      "videoUrl": "/videos/mi-primer-video/video.mp4",
+      "images": [
+        "/videos/mi-primer-video/imagen1.jpg",
+        "/videos/mi-primer-video/imagen2.jpg"
+      ],
+      "date": "2025-09-26"
+    }
+  ]
+}

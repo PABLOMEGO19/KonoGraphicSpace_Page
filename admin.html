@@ -450,41 +450,58 @@
                             <label for="video-title">Título del Video</label>
                             <input type="text" id="video-title" required>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="video-description">Descripción</label>
-                            <textarea id="video-description" required></textarea>
+                            <label for="video-short-description">Descripción Corta</label>
+                            <input type="text" id="video-short-description" required>
+                            <small>Aparecerá debajo del título en la lista de vídeos</small>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="video-page-url">URL de la Página del Video</label>
-                            <input type="url" id="video-page-url" required>
+                            <label for="video-description">Descripción Larga</label>
+                            <textarea id="video-description" rows="5" required></textarea>
+                            <small>Aparecerá en la página detallada del vídeo</small>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="video-thumbnail">URL de la Miniatura</label>
-                            <input type="url" id="video-thumbnail" required>
+                            <label for="video-page-url">URL Personalizada (opcional)</label>
+                            <input type="url" id="video-page-url" placeholder="Dejar en blanco para generar automáticamente">
                         </div>
+                        
+                        <div class="form-group">
+                            <label for="video-youtube">URL de YouTube</label>
+                            <input type="url" id="video-youtube" placeholder="https://www.youtube.com/watch?v=..." required>
+                            <small>URL completa del vídeo en YouTube</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="video-thumbnail">URL de la Miniatura (opcional si usas YouTube)</label>
+                            <input type="url" id="video-thumbnail" placeholder="Deja en blanco para usar miniatura de YouTube">
+                            <small>Si se deja en blanco, se usará la miniatura de YouTube</small>
+                        </div>
+                        
                         <div class="form-group">
                             <label for="video-tags">Etiquetas (separadas por comas)</label>
-                            <input type="text" id="video-tags" placeholder="ejemplo: gaming, entretenimiento, review">
+                            <input type="text" id="video-tags" placeholder="ej: video, tutorial, edicion" required>
+                            <small>La primera etiqueta se usará como categoría principal</small>
                         </div>
                         
                         <div class="form-group">
                             <label>Visibilidad</label>
-                            <div class="visibility-options">
-                                <label class="visibility-option">
-                                    <input type="radio" name="visibility" value="public" checked>
-                                    <span class="visibility-label">Público</span>
-                                    <span class="visibility-icon material-icons">visibility</span>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="visibility" value="public" checked> Público
                                 </label>
-                                <label class="visibility-option">
-                                    <input type="radio" name="visibility" value="hidden">
-                                    <span class="visibility-label">Oculto</span>
-                                    <span class="visibility-icon material-icons">visibility_off</span>
+                                <label>
+                                    <input type="radio" name="visibility" value="private"> Privado
                                 </label>
                             </div>
                         </div>
-                        <div class="form-buttons">
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Guardar Video</button>
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('video-form').reset();">Limpiar</button>
                             <button type="button" class="test-btn" onclick="fillTestData()">Rellenar con datos de prueba</button>
-                            <button type="submit">Agregar Video</button>
                         </div>
                     </form>
                 </div>
@@ -697,54 +714,138 @@
         }
 
         // Función para agregar o actualizar un video
-        function saveVideo() {
+        async function saveVideo() {
             const title = document.getElementById('video-title').value;
             const description = document.getElementById('video-description').value;
             const pageUrl = document.getElementById('video-page-url').value;
+            const youtubeUrl = document.getElementById('video-youtube').value;
             const thumbnailUrl = document.getElementById('video-thumbnail').value;
             const tags = document.getElementById('video-tags').value.split(',').map(tag => tag.trim());
             const isPublic = document.querySelector('input[name="visibility"]:checked').value === 'public';
+            const shortDescription = document.getElementById('video-short-description')?.value || '';
+            const longDescription = document.getElementById('video-description').value || description;
+            
+            // Extraer el ID del vídeo de YouTube
+            let youtubeId = '';
+            try {
+                const url = new URL(youtubeUrl);
+                if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
+                    if (url.hostname.includes('youtube.com')) {
+                        youtubeId = url.searchParams.get('v');
+                    } else if (url.hostname.includes('youtu.be')) {
+                        youtubeId = url.pathname.split('/').pop();
+                    }
+                }
+            } catch (e) {
+                console.error('Error al procesar la URL de YouTube:', e);
+            }
+            
+            // Si no se pudo extraer el ID, mostrar error
+            if (!youtubeId) {
+                showNotification('Por favor, introduce una URL de YouTube válida', 'error');
+                return;
+            }
+            
+            // Generar URL de miniatura de YouTube si no se proporciona una miniatura
+            const finalThumbnailUrl = thumbnailUrl || 
+                `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+            
+            // Crear un ID único para el vídeo basado en el título
+            const videoId = title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
 
             const videoData = {
+                id: videoId,
                 title,
                 description,
-                pageUrl,
-                thumbnail: thumbnailUrl,
+                shortDescription,
+                longDescription,
+                tag: tags[0] || 'Sin etiqueta',
+                pageUrl: pageUrl || `/videos/${videoId}`,
+                youtubeUrl,
+                youtubeId,
+                thumbnail: finalThumbnailUrl,
                 tags: [...new Set(tags)], // Eliminar duplicados
                 isPublic: isPublic,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                // Para compatibilidad con la generación de páginas
+                images: [
+                    finalThumbnailUrl,
+                    `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`
+                ]
             };
 
-            if (currentEditIndex === -1) {
-                // Agregar nuevo video
-                videos.push(videoData);
-            } else {
-                // Actualizar video existente
-                videos[currentEditIndex] = videoData;
-                currentEditIndex = -1;
-                document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Agregar Video';
-            }
+            try {
+                // Generar la página del vídeo
+                const pageResult = await generateVideoPage(videoData);
+                
+                if (pageResult && pageResult.success) {
+                    // Si la página se generó correctamente, actualizamos la URL
+                    videoData.pageUrl = pageResult.pageUrl;
+                    
+                    // Mostrar notificación de éxito
+                    showNotification('Vídeo guardado y página generada correctamente', 'success');
+                } else {
+                    console.warn('No se pudo generar la página del vídeo:', pageResult?.error);
+                    showNotification('Vídeo guardado, pero hubo un error al generar la página', 'warning');
+                }
+                
+                if (currentEditIndex === -1) {
+                    // Agregar nuevo video
+                    videos.push(videoData);
+                } else {
+                    // Actualizar video existente
+                    videos[currentEditIndex] = videoData;
+                    currentEditIndex = -1;
+                    document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Agregar Video';
+                }
 
-            saveVideos();
-            document.getElementById('video-form').reset();
+                saveVideos();
+                document.getElementById('video-form').reset();
+                
+                // Recargar la lista de vídeos
+                renderVideos();
+                
+            } catch (error) {
+                console.error('Error al guardar el vídeo:', error);
+                showNotification('Error al guardar el vídeo: ' + error.message, 'error');
+            }
         }
 
         // Función para editar un video
         function editVideo(index) {
             const video = videos[index];
-            document.getElementById('video-title').value = video.title;
-            document.getElementById('video-description').value = video.description;
-            document.getElementById('video-page-url').value = video.pageUrl;
-            document.getElementById('video-thumbnail').value = video.thumbnail;
-            document.getElementById('video-tags').value = video.tags.join(', ');
+            document.getElementById('video-title').value = video.title || '';
+            document.getElementById('video-short-description').value = video.shortDescription || video.description || '';
+            document.getElementById('video-description').value = video.longDescription || video.description || '';
+            document.getElementById('video-page-url').value = video.pageUrl || '';
+            document.getElementById('video-youtube').value = video.youtubeUrl || '';
+            document.getElementById('video-thumbnail').value = video.thumbnail || '';
             
-            // Establecer la visibilidad
-            const visibilityValue = video.isPublic ? 'public' : 'hidden';
+            // Manejar las etiquetas (pueden venir como array o como string)
+            if (Array.isArray(video.tags)) {
+                document.getElementById('video-tags').value = video.tags.join(', ');
+            } else if (typeof video.tags === 'string') {
+                document.getElementById('video-tags').value = video.tags;
+            } else {
+                document.getElementById('video-tags').value = '';
+            }
+            
+            // Establecer la visibilidad (por defecto a público si no está definido)
+            const visibilityValue = (video.isPublic !== undefined) ? 
+                (video.isPublic ? 'public' : 'private') : 'public';
             document.querySelector(`input[name="visibility"][value="${visibilityValue}"]`).checked = true;
             
+            // Actualizar el título del formulario y el índice actual
+            document.getElementById('form-title').textContent = 'Editar';
             currentEditIndex = index;
+            
+            // Actualizar el texto del botón de envío
             document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Actualizar Video';
-            document.getElementById('videos-section').scrollIntoView({ behavior: 'smooth' });
+            
+            // Desplazarse al formulario
+            document.getElementById('add-video-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Función para eliminar un video
@@ -1311,5 +1412,6 @@
             background: #45a049;
         }
     </style>
+    <script src="js/videoPageGenerator.js"></script>
 </body>
 </html>

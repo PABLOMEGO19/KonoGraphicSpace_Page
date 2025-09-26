@@ -1,0 +1,2 @@
+# Redirigir todas las rutas /videos/* a nuestra función
+/videos/*  /.netlify/functions/get-video/:splat  200
