@@ -143,7 +143,7 @@
             width: 20px;
             height: 20px;
             background: #e0e0e0;
-            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1-1.5-1.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/></svg>') no-repeat center;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1-1.5 1.5h-3a1.5 1.5 0 0 1-1.5-1.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/></svg>') no-repeat center;
             mask-size: contain;
         }
 
@@ -406,7 +406,6 @@
 
         <div class="dashboard-grid">
             <div class="admin-content">
-                <!-- Dashboard Section -->
                 <div id="dashboard-section" class="admin-section active">
                     <h2>Dashboard</h2>
                     <p>Bienvenido al panel de administración. Selecciona una opción para comenzar.</p>
@@ -422,7 +421,6 @@
                     </div>
                 </div>
 
-                <!-- Videos Section -->
                 <div id="videos-section" class="admin-section">
                     <div class="admin-section-header">
                         <h2>Videos Mi Trabajo</h2>
@@ -436,13 +434,10 @@
                         </div>
                     </div>
                     
-                    <!-- Lista de Videos -->
                     <div id="videos-container" class="videos-list">
-                        <!-- Los videos se cargarán aquí dinámicamente -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Añadir/Editar Video -->
                 <div id="add-video-section" class="admin-section">
                     <h2><span id="form-title">Añadir</span> Video</h2>
                     <form id="video-form">
@@ -600,7 +595,7 @@
                         <h3>${video.title} ${!video.isPublic ? '<span class="visibility-badge">Oculto</span>' : ''}</h3>
                         <p>${video.description.substring(0, 100)}${video.description.length > 100 ? '...' : ''}</p>
                         <div class="video-tags">
-                            ${video.tags.map(tag => `
+                            ${(video.tags || []).map(tag => `
                                 <span class="tag">${tag}</span>
                             `).join('')}
                         </div>
@@ -635,9 +630,9 @@
             updateDeleteButton();
             
             // Actualizar contadores en el encabezado
-            const headerElement = document.querySelector('.admin-section-header h2');
+            const headerElement = document.querySelector('#videos-section .admin-section-header h2');
             if (headerElement) {
-                headerElement.innerHTML = `Videos Publicados <span class="video-count">${videos.length} total (${publicCount} públicos, ${hiddenCount} ocultos)</span>`;
+                headerElement.innerHTML = `Videos Mi Trabajo <span class="video-count">${videos.length} total (${publicCount} públicos, ${hiddenCount} ocultos)</span>`;
             }
         }
         
@@ -656,7 +651,11 @@
             const selectedCount = document.querySelectorAll('.video-checkbox-input:checked').length;
             
             deleteBtn.disabled = selectedCount === 0;
-            deleteBtn.textContent = `Eliminar (${selectedCount})`;
+            // Actualizar el texto del botón de eliminar para que sea más claro
+            const textNode = deleteBtn.childNodes[2];
+            if (textNode) {
+                 textNode.nodeValue = ` Eliminar (${selectedCount})`;
+            }
         }
         
         // Función para cambiar la visibilidad de un video
@@ -664,6 +663,7 @@
             if (index >= 0 && index < videos.length) {
                 videos[index].isPublic = isPublic;
                 saveVideos();
+                renderVideos(); // Re-render para actualizar la vista
                 
                 // Mostrar notificación
                 const status = isPublic ? 'público' : 'oculto';
@@ -691,7 +691,10 @@
         
         // Función para eliminar los videos seleccionados
         function deleteSelectedVideos() {
-            if (!confirm('¿Estás seguro de que quieres eliminar los videos seleccionados?')) {
+            const selectedCount = document.querySelectorAll('.video-checkbox-input:checked').length;
+            if (selectedCount === 0) return;
+
+            if (!confirm(`¿Estás seguro de que quieres eliminar los ${selectedCount} videos seleccionados?`)) {
                 return;
             }
             
@@ -710,30 +713,23 @@
             
             // Guardar cambios y actualizar la vista
             saveVideos();
+            renderVideos();
+            showNotification(`${selectedCount} video(s) eliminado(s) correctamente`, 'success');
+        }
 
-// Función para seleccionar/deseleccionar todos los videos
-function toggleSelectAll(checkbox) {
-    const checkboxes = document.querySelectorAll('.video-checkbox-input');
-    checkboxes.forEach(cb => {
-        cb.checked = checkbox.checked;
-    });
-    updateDeleteButton();
-}
-
-// Función para actualizar el estado del botón de eliminar seleccionados
-function updateDeleteButton() {
-    const deleteBtn = document.getElementById('delete-selected-btn');
-    const selectedCount = document.querySelectorAll('.video-checkbox-input:checked').length;
-    
-    deleteBtn.disabled = selectedCount === 0;
-    deleteBtn.textContent = `Eliminar (${selectedCount})`;
-}
-
-// Función para cambiar la visibilidad de un video
-function toggleVideoVisibility(index, isPublic) {
-    if (index >= 0 && index < videos.length) {
-        videos[index].isPublic = isPublic;
-        saveVideos();
+        // Función para poblar el formulario para edición
+        function editVideo(index) {
+            if (index < 0 || index >= videos.length) return;
+            
+            const video = videos[index];
+            
+            // Rellenar el formulario con los datos del video
+            document.getElementById('video-title').value = video.title || '';
+            document.getElementById('video-short-description').value = video.shortDescription || '';
+            document.getElementById('video-description').value = video.description || '';
+            document.getElementById('video-page-url').value = video.pageUrl || '';
+            document.getElementById('video-youtube').value = video.youtubeUrl || '';
+            document.getElementById('video-thumbnail').value = video.thumbnail || '';
             
             // Manejar las etiquetas (pueden venir como array o como string)
             if (Array.isArray(video.tags)) {
@@ -756,6 +752,9 @@ function toggleVideoVisibility(index, isPublic) {
             // Actualizar el texto del botón de envío
             document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Actualizar Video';
             
+            // Navegar a la sección del formulario
+            navigateTo('add-video');
+
             // Desplazarse al formulario
             document.getElementById('add-video-section').scrollIntoView({ behavior: 'smooth' });
         }
@@ -765,62 +764,52 @@ function toggleVideoVisibility(index, isPublic) {
             if (confirm('¿Estás seguro de que quieres eliminar este video?')) {
                 videos.splice(index, 1);
                 saveVideos();
-            }
-        }
-
-        // Función para actualizar la página de Mi Trabajo
-        function updateMiTrabajoPage() {
-            // Guardar los videos en localStorage
-            localStorage.setItem('videos', JSON.stringify(videos));
-            
-            // Disparar un evento personalizado para notificar a otras pestañas
-            const event = new StorageEvent('storage', {
-                key: 'videos',
-                newValue: JSON.stringify(videos)
-            });
-            window.dispatchEvent(event);
-            
-            // Si estamos en la sección de videos, actualizar la lista
-            if (document.getElementById('videos-section').classList.contains('active')) {
                 renderVideos();
+                showNotification('Video eliminado correctamente', 'success');
             }
-            
-            // Mostrar mensaje de éxito
-            alert('Videos actualizados correctamente');
         }
 
         // Función de logout
         function logout() {
-            // Aquí iría la lógica de cierre de sesión
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminUsername');
             alert('Cerrando sesión...');
             window.location.href = 'admin_login.html';
         }
 
-        // Función para navegar
+        // Función para navegar entre secciones
         function navigateTo(section) {
             // Ocultar todas las secciones
             document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
             
-            // Mostrar la sección seleccionada
-            const sectionElement = document.getElementById(section + '-section');
+            const sectionId = section + '-section';
+            const sectionElement = document.getElementById(sectionId);
             if (sectionElement) {
                 sectionElement.classList.add('active');
             }
             
             // Actualizar la clase active en la navegación
-            document.querySelectorAll('.admin-sidebar a').forEach(link => {
+            document.querySelectorAll('.admin-sidebar nav a').forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(section)) {
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${section}'`)) {
                     link.classList.add('active');
                 }
             });
+
+             // Si se navega para añadir un video, resetear el formulario
+            if (section === 'add-video' && currentEditIndex === -1) {
+                document.getElementById('form-title').textContent = 'Añadir';
+                document.getElementById('video-form').reset();
+                document.getElementById('video-form').querySelector('button[type="submit"]').textContent = 'Guardar Video';
+                currentEditIndex = -1;
+            }
             
-            // Manejar casos especiales
-            if (section === 'add-video') {
-                document.title = 'Añadir Video | Panel de Administración';
-            } else if (section === 'videos') {
+            // Manejar títulos de página y renderizado
+            if (section === 'videos') {
                 document.title = 'Gestión de Videos | Panel de Administración';
                 renderVideos();
+            } else if (section === 'add-video') {
+                document.title = 'Añadir/Editar Video | Panel de Administración';
             } else {
                 document.title = 'Panel de Administración';
             }
@@ -828,36 +817,35 @@ function toggleVideoVisibility(index, isPublic) {
 
         // Función para rellenar el formulario con datos de prueba
         function fillTestData() {
-            // Datos de prueba
             const testData = {
-                title: 'Título del Video de Prueba',
-                description: 'Esta es una descripción de ejemplo para el video de prueba. Aquí puedes incluir detalles sobre el contenido del video.',
-                pageUrl: 'https://www.ejemplo.com/video-prueba',
+                title: 'Video de Prueba',
+                shortDescription: 'Descripción corta para pruebas.',
+                description: 'Esta es una descripción larga de ejemplo para el video de prueba. Aquí puedes incluir detalles sobre el contenido del video.',
+                youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                pageUrl: '',
                 thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
                 tags: 'gaming, entretenimiento, review'
             };
 
-            // Rellenar los campos del formulario
             document.getElementById('video-title').value = testData.title;
+            document.getElementById('video-short-description').value = testData.shortDescription;
             document.getElementById('video-description').value = testData.description;
+            document.getElementById('video-youtube').value = testData.youtubeUrl;
             document.getElementById('video-page-url').value = testData.pageUrl;
             document.getElementById('video-thumbnail').value = testData.thumbnail;
             document.getElementById('video-tags').value = testData.tags;
 
-            // Mostrar un mensaje de confirmación
-            alert('Formulario rellenado con datos de prueba. ¡Ahora puedes hacer clic en "Agregar Video" para guardar!');
+            showNotification('Formulario rellenado con datos de prueba');
         }
 
         // Funciones para reordenar videos
         function moveVideoUp(index) {
             if (index <= 0) return;
             
-            // Intercambiar el orden con el video de arriba
-            const tempOrder = videos[index].order;
-            videos[index].order = videos[index - 1].order;
-            videos[index - 1].order = tempOrder;
+            const temp = videos[index];
+            videos[index] = videos[index - 1];
+            videos[index - 1] = temp;
             
-            // Guardar y volver a renderizar
             saveVideos();
             renderVideos();
             showNotification('Orden de videos actualizado');
@@ -866,12 +854,10 @@ function toggleVideoVisibility(index, isPublic) {
         function moveVideoDown(index) {
             if (index >= videos.length - 1) return;
             
-            // Intercambiar el orden con el video de abajo
-            const tempOrder = videos[index].order;
-            videos[index].order = videos[index + 1].order;
-            videos[index + 1].order = tempOrder;
+            const temp = videos[index];
+            videos[index] = videos[index + 1];
+            videos[index + 1] = temp;
             
-            // Guardar y volver a renderizar
             saveVideos();
             renderVideos();
             showNotification('Orden de videos actualizado');
@@ -879,11 +865,11 @@ function toggleVideoVisibility(index, isPublic) {
         
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            renderVideos();
+            navigateTo('dashboard'); // Iniciar en el dashboard
             
-            // Manejar el envío del formulario
             document.getElementById('video-form').addEventListener('submit', function(e) {
                 e.preventDefault();
+                // La lógica de guardado está en saveVideoFunction.js, pero la llamamos desde aquí
                 saveVideo();
             });
         });
