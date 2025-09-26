@@ -510,33 +510,33 @@
             window.location.href = 'admin_login.html';
         }
 
+        // Inicializar variables globales
+        window.videos = JSON.parse(localStorage.getItem('videos')) || [];
+        window.currentEditIndex = -1;
+
         // Mostrar nombre de usuario
         const username = sessionStorage.getItem('adminUsername');
         if (username) {
             document.getElementById('adminUsername').textContent = username.charAt(0).toUpperCase() + username.slice(1);
         }
 
-        // Datos de ejemplo para videos
-        let videos = JSON.parse(localStorage.getItem('videos')) || [];
-        let currentEditIndex = -1;
-
         // Función para guardar videos en localStorage
         function saveVideos() {
             // Asegurarse de que cada video tenga un campo de orden
-            videos = videos.map((video, index) => ({
+            window.videos = window.videos.map((video, index) => ({
                 ...video,
                 order: video.order !== undefined ? video.order : index
             }));
             
             // Ordenar los videos por el campo 'order'
-            videos.sort((a, b) => (a.order || 0) - (b.order || 0));
+            window.videos.sort((a, b) => (a.order || 0) - (b.order || 0));
             
             // Actualizar los índices de orden por si hay huecos
-            videos.forEach((video, index) => {
+            window.videos.forEach((video, index) => {
                 video.order = index;
             });
             
-            localStorage.setItem('videos', JSON.stringify(videos));
+            localStorage.setItem('videos', JSON.stringify(window.videos));
             
             // Disparar evento personalizado para notificar a otras pestañas
             const event = new Event('videosUpdated');
@@ -547,14 +547,11 @@
         function renderVideos() {
             const container = document.getElementById('videos-container');
             container.innerHTML = '';
-            
-            // Asegurarse de que los videos estén ordenados
-            videos.sort((a, b) => (a.order || 0) - (b.order || 0));
-            
-            // Contadores para estadísticas
-            let publicCount = 0;
-            let hiddenCount = 0;
 
+            if (window.videos.length === 0) {
+                container.innerHTML = '<p>No hay videos guardados.</p>';
+                return;
+            }
             // Crear encabezado de la tabla
             const header = document.createElement('div');
             header.className = 'video-item header';
@@ -573,7 +570,7 @@
             container.appendChild(header);
 
             // Agregar cada video a la lista
-            videos.forEach((video, index) => {
+            window.videos.forEach((video, index) => {
                 // Actualizar contadores
                 if (video.isPublic) {
                     publicCount++;
@@ -611,7 +608,7 @@
                           <button onclick="moveVideoUp(${index})" class="reorder-btn" title="Mover arriba" ${index === 0 ? 'disabled' : ''}>
                               <span class="material-icons">arrow_upward</span>
                           </button>
-                          <button onclick="moveVideoDown(${index})" class="reorder-btn" title="Mover abajo" ${index === videos.length - 1 ? 'disabled' : ''}>
+                          <button onclick="moveVideoDown(${index})" class="reorder-btn" title="Mover abajo" ${index === window.videos.length - 1 ? 'disabled' : ''}>
                               <span class="material-icons">arrow_downward</span>
                           </button>
                       </div>
@@ -632,7 +629,7 @@
             // Actualizar contadores en el encabezado
             const headerElement = document.querySelector('#videos-section .admin-section-header h2');
             if (headerElement) {
-                headerElement.innerHTML = `Videos Mi Trabajo <span class="video-count">${videos.length} total (${publicCount} públicos, ${hiddenCount} ocultos)</span>`;
+                headerElement.innerHTML = `Videos Mi Trabajo <span class="video-count">${window.videos.length} total (${publicCount} públicos, ${hiddenCount} ocultos)</span>`;
             }
         }
         
@@ -660,8 +657,8 @@
         
         // Función para cambiar la visibilidad de un video
         function toggleVideoVisibility(index, isPublic) {
-            if (index >= 0 && index < videos.length) {
-                videos[index].isPublic = isPublic;
+            if (index >= 0 && index < window.videos.length) {
+                window.videos[index].isPublic = isPublic;
                 saveVideos();
                 renderVideos(); // Re-render para actualizar la vista
                 
@@ -706,8 +703,8 @@
             
             // Eliminar los videos seleccionados
             indicesToDelete.forEach(index => {
-                if (index >= 0 && index < videos.length) {
-                    videos.splice(index, 1);
+                if (index >= 0 && index < window.videos.length) {
+                    window.videos.splice(index, 1);
                 }
             });
             
@@ -719,9 +716,9 @@
 
         // Función para poblar el formulario para edición
         function editVideo(index) {
-            if (index < 0 || index >= videos.length) return;
+            if (index < 0 || index >= window.videos.length) return;
             
-            const video = videos[index];
+            const video = window.videos[index];
             
             // Rellenar el formulario con los datos del video
             document.getElementById('video-title').value = video.title || '';
@@ -762,7 +759,7 @@
         // Función para eliminar un video
         function deleteVideo(index) {
             if (confirm('¿Estás seguro de que quieres eliminar este video?')) {
-                videos.splice(index, 1);
+                window.videos.splice(index, 1);
                 saveVideos();
                 renderVideos();
                 showNotification('Video eliminado correctamente', 'success');
@@ -842,9 +839,13 @@
         function moveVideoUp(index) {
             if (index <= 0) return;
             
-            const temp = videos[index];
-            videos[index] = videos[index - 1];
-            videos[index - 1] = temp;
+            const temp = window.videos[index];
+            window.videos[index] = window.videos[index - 1];
+            window.videos[index - 1] = temp;
+            
+            // Actualizar los índices de orden
+            window.videos[index].order = index;
+            window.videos[index - 1].order = index - 1;
             
             saveVideos();
             renderVideos();
@@ -852,11 +853,15 @@
         }
         
         function moveVideoDown(index) {
-            if (index >= videos.length - 1) return;
+            if (index >= window.videos.length - 1) return;
             
-            const temp = videos[index];
-            videos[index] = videos[index + 1];
-            videos[index + 1] = temp;
+            const temp = window.videos[index];
+            window.videos[index] = window.videos[index + 1];
+            window.videos[index + 1] = temp;
+            
+            // Actualizar los índices de orden
+            window.videos[index].order = index;
+            window.videos[index + 1].order = index + 1;
             
             saveVideos();
             renderVideos();

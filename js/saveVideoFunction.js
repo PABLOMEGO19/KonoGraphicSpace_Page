@@ -1,6 +1,11 @@
 // Función para guardar un video
 async function saveVideo() {
     try {
+        // Asegurarse de que window.videos esté inicializado
+        if (!window.videos) {
+            window.videos = [];
+        }
+        
         const title = document.getElementById('video-title').value;
         const description = document.getElementById('video-description').value;
         const youtubeUrl = document.getElementById('video-youtube').value;
