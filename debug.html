@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Endpoints - Kono Graphic</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Prueba de Endpoints PHP</h1>
+
+    <div class="test">
+        <h3>1. Probar PHP básico</h3>
+        <button onclick="testPHP()">Probar test.php</button>
+        <div id="phpResult"></div>
+    </div>
+
+    <div class="test">
+        <h3>2. Probar inserción de video</h3>
+        <button onclick="testInsert()">Probar insert-video.php</button>
+        <div id="insertResult"></div>
+    </div>
+
+    <script>
+        async function testPHP() {
+            const result = document.getElementById('phpResult');
+            result.innerHTML = 'Probando...';
+
+            try {
+                const response = await fetch('test.php');
+                const text = await response.text();
+                result.innerHTML = '<div>Respuesta: ' + text + '</div>';
+
+                try {
+                    const data = JSON.parse(text);
+                    result.innerHTML += '<div class="success">✅ JSON válido: ' + data.message + '</div>';
+                } catch (e) {
+                    result.innerHTML += '<div class="error">❌ Error JSON: ' + e.message + '</div>';
+                }
+            } catch (error) {
+                result.innerHTML = '<div class="error">❌ Error de conexión: ' + error.message + '</div>';
+            }
+        }
+
+        async function testInsert() {
+            const result = document.getElementById('insertResult');
+            result.innerHTML = 'Probando...';
+
+            try {
+                const response = await fetch('insert-video.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: '<!-- Código de prueba -->'
+                    })
+                });
+
+                const text = await response.text();
+                result.innerHTML = '<div>Respuesta: ' + text + '</div>';
+
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        result.innerHTML += '<div class="success">✅ Inserción exitosa: ' + data.message + '</div>';
+                    } else {
+                        result.innerHTML += '<div class="error">❌ Error: ' + data.error + '</div>';
+                    }
+                } catch (e) {
+                    result.innerHTML += '<div class="error">❌ Error JSON: ' + e.message + '</div>';
+                }
+            } catch (error) {
+                result.innerHTML = '<div class="error">❌ Error de conexión: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
